@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI 写作助手</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      width: 360px;
+      padding: 20px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f8fafc;
+    }
+    h2 {
+      font-size: 18px;
+      color: #1e293b;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+    .status {
+      padding: 8px 12px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      font-size: 13px;
+      text-align: center;
+    }
+    .status.active { background: #dcfce7; color: #166534; }
+    .status.inactive { background: #fef2f2; color: #991b1b; }
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #475569;
+      margin-bottom: 4px;
+    }
+    input {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+    input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 8px;
+    }
+    button:hover { opacity: 0.9; }
+    .instructions {
+      margin-top: 16px;
+      padding: 12px;
+      background: #fff;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+      font-size: 12px;
+      color: #64748b;
+      line-height: 1.6;
+    }
+    .instructions strong { color: #475569; }
+  </style>
+</head>
+<body>
+  <h2>🤖 AI 写作助手</h2>
+  <div id="status" class="status inactive">请配置API Key</div>
+
+  <label>DeepSeek API Key</label>
+  <input type="password" id="apiKey" placeholder="sk-...">
+  <button id="saveBtn">保存设置</button>
+
+  <div class="instructions">
+    <strong>使用方法：</strong><br>
+    1. 在任意网页选中文字<br>
+    2. 右键选择AI功能（润色/翻译/续写/摘要）<br>
+    3. AI结果会显示在页面右上角<br>
+    4. 可以替换原文或复制结果
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
