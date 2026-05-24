@@ -13,9 +13,9 @@ import urllib.parse
 from config import settings
 import os
 
-EPAY_API_URL = os.getenv("EPAY_API_URL", "https://pay.bbbapi.com")
-EPAY_PID = os.getenv("EPAY_PID", "")
-EPAY_KEY = os.getenv("EPAY_KEY", "")
+EPAY_API_URL = os.getenv("EPAY_API_URL", "https://pay.yzfpay.com")
+EPAY_PID = os.getenv("EPAY_PID", "11431")
+EPAY_KEY = os.getenv("EPAY_KEY", "22FS28Z22M98Z2a6a928020Oo906V50Z")
 
 
 def create_epay_order(

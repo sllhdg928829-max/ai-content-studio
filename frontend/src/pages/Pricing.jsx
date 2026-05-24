@@ -46,28 +46,52 @@ export default function Pricing() {
     }
   }
 
+  const goToPay = () => {
+    if (order?.pay_url) {
+      window.open(order.pay_url, '_blank')
+    }
+  }
+
   if (step === 'pay' && order) {
+    const hasEpay = order.pay_type === 'epay' && order.pay_url
     return (
       <div className="max-w-lg mx-auto">
         <div className="bg-white p-8 rounded-xl shadow-sm border text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">扫码支付</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            {hasEpay ? '前往支付' : '扫码支付'}
+          </h2>
           <div className="text-6xl font-bold text-indigo-600 mb-2">¥{order.amount_yuan}</div>
           <p className="text-gray-600 mb-6">{order.package_name} · {order.credits}积分</p>
 
-          <div className="bg-gray-100 rounded-lg p-8 mb-6 mx-auto w-48 h-48 flex items-center justify-center">
-            <div className="text-center">
-              <div className="text-6xl mb-2">{paymentMethod === 'wechat' ? '💚' : '💙'}</div>
-              <div className="text-sm text-gray-500">{paymentMethod === 'wechat' ? '微信支付' : '支付宝'}</div>
+          {hasEpay ? (
+            <div className="space-y-4">
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
+                <p className="text-green-700 font-medium">已接入{paymentMethod === 'wechat' ? '微信' : '支付宝'}支付</p>
+                <p className="text-green-600 text-sm mt-1">点击下方按钮跳转到支付页面</p>
+              </div>
+              <button onClick={goToPay}
+                className="w-full py-4 px-4 bg-green-600 text-white rounded-lg hover:bg-green-700 text-lg font-bold">
+                {paymentMethod === 'wechat' ? '💚 微信支付 ¥' : '💙 支付宝 ¥'}{order.amount_yuan}
+              </button>
             </div>
-          </div>
+          ) : (
+            <div>
+              <div className="bg-gray-100 rounded-lg p-8 mb-6 mx-auto w-48 h-48 flex items-center justify-center">
+                <div className="text-center">
+                  <div className="text-6xl mb-2">{paymentMethod === 'wechat' ? '💚' : '💙'}</div>
+                  <div className="text-sm text-gray-500">{paymentMethod === 'wechat' ? '微信收款码' : '支付宝收款码'}</div>
+                </div>
+              </div>
+              <p className="text-sm text-gray-500 mb-4">请使用{paymentMethod === 'wechat' ? '微信' : '支付宝'}扫码支付</p>
+            </div>
+          )}
 
-          <p className="text-sm text-gray-500 mb-4">
-            请使用{paymentMethod === 'wechat' ? '微信' : '支付宝'}扫描二维码支付
-            <br />订单号: <code className="bg-gray-100 px-2 py-0.5 rounded text-xs">{order.order_id}</code>
+          <p className="text-sm text-gray-500 mt-4">
+            订单号: <code className="bg-gray-100 px-2 py-0.5 rounded text-xs">{order.order_id}</code>
           </p>
 
-          <div className="border-t pt-4 mb-4">
-            <p className="text-sm text-gray-600 mb-2">支付完成后，请填写微信/支付宝交易单号</p>
+          <div className="border-t pt-4 mt-4">
+            <p className="text-sm text-gray-600 mb-2">支付完成后，请填写交易单号（用于手动对账）</p>
             <input type="text" value={transId} onChange={e => setTransId(e.target.value)}
               placeholder="交易单号（如：4200001234567890123）"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
@@ -75,7 +99,7 @@ export default function Pricing() {
 
           {message && <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm mb-4">{message}</div>}
 
-          <div className="flex gap-3">
+          <div className="flex gap-3 mt-4">
             <button onClick={() => setStep('select')} className="flex-1 py-2 px-4 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
               返回
             </button>

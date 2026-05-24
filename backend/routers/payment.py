@@ -42,12 +42,14 @@ def create_order(
 
     # Try epay first
     epay_type = "wxpay" if payment_method == "wechat" else "alipay"
+    import os
+    public_url = os.getenv("PUBLIC_BACKEND_URL", "http://localhost:8000")
     epay_result = create_epay_order(
         order_id=order_id,
         amount=pkg["price_yuan"],
         payment_type=epay_type,
-        notify_url="",  # Set to your public backend URL + /api/payment/epay-callback
-        return_url="",
+        notify_url=f"{public_url}/api/payment/epay-callback",
+        return_url=f"{public_url}/api/payment/return",
     )
 
     return {
