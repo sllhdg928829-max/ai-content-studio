@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import api from '../api'
+import api, { setApiBaseUrl, getApiBaseUrl } from '../api'
 
 export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [showSettings, setShowSettings] = useState(false)
+  const [apiUrl, setApiUrl] = useState(getApiBaseUrl())
   const navigate = useNavigate()
 
   const handleSubmit = async (e) => {
@@ -19,9 +21,16 @@ export default function Login() {
       localStorage.setItem('user', JSON.stringify(data.user))
       navigate('/')
     } catch (err) {
-      setError(err.response?.data?.detail || '登录失败')
+      setError(err.response?.data?.detail || '登录失败，请检查网络或API地址')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const saveApiUrl = () => {
+    if (apiUrl.trim()) {
+      setApiBaseUrl(apiUrl.trim())
+      setShowSettings(false)
     }
   }
 
@@ -51,6 +60,27 @@ export default function Login() {
           <p className="text-center text-sm text-gray-600">
             还没有账号？ <Link to="/register" className="text-indigo-600 hover:text-indigo-500">立即注册</Link>
           </p>
+          <p className="text-center">
+            <button type="button" onClick={() => setShowSettings(!showSettings)}
+              className="text-xs text-gray-400 hover:text-gray-600">
+              {showSettings ? '隐藏设置' : 'API服务器设置'}
+            </button>
+          </p>
+          {showSettings && (
+            <div className="bg-gray-50 p-4 rounded-lg border">
+              <label className="block text-xs font-medium text-gray-600 mb-1">API服务器地址</label>
+              <div className="flex gap-2">
+                <input type="text" value={apiUrl} onChange={e => setApiUrl(e.target.value)}
+                  placeholder="https://xxx.trycloudflare.com/api"
+                  className="flex-1 px-2 py-1.5 border border-gray-300 rounded text-sm" />
+                <button type="button" onClick={saveApiUrl}
+                  className="px-3 py-1.5 bg-indigo-600 text-white rounded text-sm hover:bg-indigo-700">
+                  保存
+                </button>
+              </div>
+              <p className="text-xs text-gray-400 mt-1">默认为：{import.meta.env.VITE_API_URL}</p>
+            </div>
+          )}
         </form>
       </div>
     </div>

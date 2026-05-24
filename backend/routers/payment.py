@@ -1,11 +1,12 @@
 import uuid
 import datetime
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request, Query
 from sqlalchemy.orm import Session
 
 from database import get_db
 from models import User, PaymentRecord
 from auth import get_current_user
+from services.epay_service import create_epay_order, verify_epay_callback
 
 router = APIRouter(prefix="/api/payment", tags=["payment"])
 
@@ -18,7 +19,7 @@ CREDIT_PACKAGES = {
 
 @router.post("/create-order")
 def create_order(
-    package_id: str,
+    package_id: str = Query(...),
     payment_method: str = "wechat",
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
@@ -27,17 +28,27 @@ def create_order(
     if not pkg:
         raise HTTPException(status_code=400, detail="Invalid package")
 
-    order_id = str(uuid.uuid4())[:12]
+    order_id = str(uuid.uuid4())[:10]
     record = PaymentRecord(
         user_id=user.id,
-        amount=int(pkg["price_yuan"] * 100),  # store as cents/fen
+        order_id=order_id,
+        amount=int(pkg["price_yuan"] * 100),
         credits_purchased=pkg["credits"],
         payment_method=payment_method,
         status="pending",
-        order_id=order_id,
     )
     db.add(record)
     db.commit()
+
+    # Try epay first
+    epay_type = "wxpay" if payment_method == "wechat" else "alipay"
+    epay_result = create_epay_order(
+        order_id=order_id,
+        amount=pkg["price_yuan"],
+        payment_type=epay_type,
+        notify_url="",  # Set to your public backend URL + /api/payment/epay-callback
+        return_url="",
+    )
 
     return {
         "order_id": order_id,
@@ -45,8 +56,32 @@ def create_order(
         "credits": pkg["credits"],
         "package_name": pkg["name"],
         "payment_method": payment_method,
-        "qr_note": f"AI Content Studio - {pkg['name']} - 订单号: {order_id}",
+        "qr_note": f"AI Content Studio - {pkg['name']} - 订单: {order_id}",
+        "pay_type": epay_result["type"],
+        "pay_url": epay_result.get("pay_url", ""),
     }
+
+
+@router.post("/epay-callback")
+async def epay_callback(request: Request, db: Session = Depends(get_db)):
+    """Epay payment callback - auto-verifies and adds credits."""
+    params = dict(await request.form())
+    success, order_id, money = verify_epay_callback(params)
+
+    if not success:
+        return "fail"
+
+    record = db.query(PaymentRecord).filter(PaymentRecord.order_id == order_id).first()
+    if not record:
+        return "fail"
+
+    record.status = "completed"
+    buyer = db.query(User).filter(User.id == record.user_id).first()
+    if buyer:
+        buyer.credits += record.credits_purchased
+    db.commit()
+
+    return "success"
 
 
 @router.post("/verify-payment")
