@@ -5,6 +5,7 @@ import Register from './pages/Register'
 import Dashboard from './pages/Dashboard'
 import ContentGenerator from './pages/ContentGenerator'
 import Pricing from './pages/Pricing'
+import Admin from './pages/Admin'
 
 function PrivateRoute({ children }) {
   const token = localStorage.getItem('token')
@@ -21,6 +22,7 @@ export default function App() {
           <Route index element={<Dashboard />} />
           <Route path="generate" element={<ContentGenerator />} />
           <Route path="pricing" element={<Pricing />} />
+          <Route path="admin" element={<Admin />} />
         </Route>
       </Routes>
     </BrowserRouter>

@@ -31,6 +31,11 @@ export default function Layout() {
                 <NavLink to="/pricing" className={({isActive}) => `px-3 py-2 rounded-md text-sm font-medium ${isActive ? 'bg-indigo-50 text-indigo-700' : 'text-gray-700 hover:text-indigo-600'}`}>
                   购买积分
                 </NavLink>
+                {user.is_admin && (
+                  <NavLink to="/admin" className={({isActive}) => `px-3 py-2 rounded-md text-sm font-medium ${isActive ? 'bg-red-50 text-red-700' : 'text-gray-700 hover:text-red-600'}`}>
+                    管理
+                  </NavLink>
+                )}
               </div>
             </div>
             <div className="flex items-center space-x-4">

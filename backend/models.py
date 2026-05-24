@@ -37,6 +37,8 @@ class PaymentRecord(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, nullable=False)
+    order_id = Column(String(50), unique=True, nullable=True)
+    transaction_id = Column(String(100), nullable=True)
     amount = Column(Integer, default=0)  # 金额（分）
     credits_purchased = Column(Integer, default=0)
     payment_method = Column(String(50), nullable=True)
